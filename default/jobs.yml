@@ -58,7 +58,7 @@ vct_prisma_airs_session_actions:
             value: "'0'"
         discoverRequestHeaders:
           - name: Accept
-            value: changeme
+            value: "'application/json'"
         discoverDataField: items
         pagination:
           type: none
@@ -80,7 +80,7 @@ vct_prisma_airs_session_actions:
           value: "'day'"
       collectRequestHeaders:
         - name: Accept
-          value: changeme
+          value: "'application/json'"
       pagination:
         type: request_offset
         offsetField: offset
