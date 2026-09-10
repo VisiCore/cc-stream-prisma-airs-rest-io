@@ -68,6 +68,24 @@ Open the collector `vct_prisma_airs_session_actions` inside the pack, click **Ru
 
 Upgrading in place keeps your pack variables and route output. The `vct_prisma_airs_session_actions` pipeline contains only the Parser null-removal step; if you add your own functions, copy the pipeline rather than editing it so upgrades do not overwrite your changes.
 
+## References
+
+Palo Alto Networks documentation used to build and operate this pack:
+
+- [Prisma AIRS AI Runtime Management APIs Overview](https://pan.dev/prisma-airs/api/airuntimesecurity/prismaairsmanagementapi/) - the OAuth-protected API this pack polls (`https://api.sase.paloaltonetworks.com/aisec`)
+- [Strata Cloud Manager RBAC Roles for Prisma AIRS](https://pan.dev/prisma-airs/api/airuntimesecurity/oauth-based-authentication/) - service account roles and the `airs_api.*` permissions; a 403 with `x-opa-decision: false` means the role lacks these
+- [Strata Cloud Manager Access Tokens](https://pan.dev/scm/docs/access-tokens/) - client-credentials token flow, `scope=tsg_id:<id>`, 15 minute lifetime
+- [Tenant Service Groups](https://pan.dev/sase/docs/tenant-service-groups/) - what the TSG id is and how token scope is routed
+- [Prisma AIRS API Scan Logs](https://docs.paloaltonetworks.com/ai-runtime-security/administration/detect-and-alert-on-malicious-traffic/ai-runtime-security-intercept-scan-logs) - the SCM scan log view this data corresponds to, and the alternative SIEM push path via Strata Logging Service
+- [Prisma AIRS AI Runtime API (Scan API)](https://pan.dev/prisma-airs/api/airuntimesecurity/airuntimesecurityapi/) - the per-application `x-pan-token` data plane; not used by this pack, documented here to avoid confusion
+- [Create a Prisma AIRS AI Runtime API Application](https://docs.paloaltonetworks.com/ai-runtime-security/administration/prevent-network-security-threats/onboard-api-runtime-security-api-intercept-in-scm) - where API keys and security profiles are managed in SCM
+- [Manage Applications, API Keys, Security Profiles](https://docs.paloaltonetworks.com/ai-runtime-security/administration/api-intercept-create-configure-security-profile/airs-apirs-manage-api-keys-profile-apps)
+
+Community references that document the dashboard session endpoints and the `scanlogs` outage:
+
+- [cdot65/prisma-airs-go](https://github.com/cdot65/prisma-airs-go) and [cdot65/prisma-airs-sdk](https://github.com/cdot65/prisma-airs-sdk) - endpoint paths and request/response models
+- [Cribl REST Collector docs](https://docs.cribl.io/stream/collectors-rest/) - discover/collect, pagination, and state tracking used by the collector
+
 ## Authors
 
 - Andrew Hendrix <Andrewh@visicoretech.com>
