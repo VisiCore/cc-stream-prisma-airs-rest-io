@@ -1,0 +1,22 @@
+output: default
+streamtags:
+  - vct
+  - prisma-airs
+groups: {}
+asyncFuncTimeout: 1000
+description: "Prisma AIRS session-action events: Parser (JSON reserialize)
+  removes null/empty values from _raw. Events otherwise pass through unchanged."
+functions:
+  - id: serde
+    filter: "true"
+    disabled: false
+    conf:
+      mode: reserialize
+      type: json
+      srcField: _raw
+      iterations: 100
+      overwrite: false
+      tagDatatype: false
+      fieldFilterExpr: value != null && value !== '' && value !== undefined
+    final: false
+    description: Remove null/empty values from _raw (Parser reserialize with a field filter)

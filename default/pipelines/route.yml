@@ -1,0 +1,23 @@
+id: default
+routes:
+  - id: vct_prisma_airs_session_actions
+    name: vct_prisma_airs_session_actions
+    final: true
+    disabled: false
+    pipeline: vct_prisma_airs_session_actions
+    description: Prisma AIRS scan actions from the pack collector. devnull is a
+      placeholder; point at your SIEM/lake destination.
+    enableOutputExpression: false
+    filter: datatype=='prisma_airs_session_action'
+    clones: []
+    output: devnull
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    enableOutputExpression: false
+    filter: "true"
+    clones: []
+    output: default

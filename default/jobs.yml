@@ -1,0 +1,158 @@
+vct_prisma_airs_session_actions:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  description: Prisma AIRS scan activity via SCM Management API dashboard/v2
+    sessions (discover = sessions active in last hour; collect = each session's
+    scan actions, 1-day window, offset paging). Events flow to the pack routes.
+    Configure pack vars + the group secret before enabling the schedule.
+  streamtags:
+    - vct
+    - prisma-airs
+    - ai-security
+  workerAffinity: false
+  schedule:
+    enabled: false
+    cronSchedule: "*/15 * * * *"
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 30m
+      mode: run
+      timeRangeType: relative
+      earliest: -2h
+      latest: now
+      timestampTimezone: UTC
+      expression: _time > (__collectible.state.latestTime || 0)
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        enabled: true
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+  collector:
+    type: rest
+    destructive: false
+    encoding: utf8
+    conf:
+      discovery:
+        discoverType: http
+        discoverMethod: get
+        discoverUrl: "`${C.vars.vct_prisma_airs_mgmt_host}/v1/mgmt/dashboard/v2/session\
+          s/sessionsoverview`"
+        discoverRequestParams:
+          - name: time_interval
+            value: "'1'"
+          - name: time_unit
+            value: "'hour'"
+          - name: limit
+            value: "'500'"
+          - name: offset
+            value: "'0'"
+        discoverRequestHeaders:
+          - name: Accept
+            value: changeme
+        discoverDataField: items
+        pagination:
+          type: none
+        enableStrictDiscoverParsing: false
+        enableDiscoverCode: false
+      collectUrl: "`${C.vars.vct_prisma_airs_mgmt_host}/v1/mgmt/dashboard/v2/sessions\
+        /session`"
+      collectMethod: get
+      collectRequestParams:
+        - name: session_id
+          value: "`${session_id}`"
+        - name: app_id
+          value: "`${application_id}`"
+        - name: app_name
+          value: "`${application_name}`"
+        - name: time_interval
+          value: "'1'"
+        - name: time_unit
+          value: "'day'"
+      collectRequestHeaders:
+        - name: Accept
+          value: changeme
+      pagination:
+        type: request_offset
+        offsetField: offset
+        limitField: limit
+        limit: 100
+        totalRecordField: pagination.total_items
+        maxPages: 0
+        zeroIndexed: true
+        offset: 0
+      authentication: oauthSecret
+      loginUrl: "'https://auth.apps.paloaltonetworks.com/oauth2/access_token'"
+      tokenRespAttribute: access_token
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      clientSecretParamName: client_secret
+      textSecret: vct-prisma-airs-rest-secret
+      authRequestParams:
+        - name: grant_type
+          value: "'client_credentials'"
+        - name: scope
+          value: "`tsg_id:${C.vars.vct_prisma_airs_tsg_id}`"
+        - name: client_id
+          value: C.vars.vct_prisma_airs_client_id
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: true
+      decodeUrl: false
+      rejectUnauthorized: true
+      captureHeaders: false
+      stopOnEmptyResults: true
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 502
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      filter: (true)
+      discoverToRoutes: false
+      metadata:
+        - name: datatype
+          value: "'prisma_airs_session_action'"
+        - name: sourcetype
+          value: "'prisma:airs:session_action'"
+        - name: vendor
+          value: "'Palo Alto Networks'"
+        - name: product
+          value: "'Prisma AIRS'"
+      removeFields: []
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - _vct_prisma_airs_eb
+    metadata:
+      - name: datatype
+        value: "'prisma_airs_session_action'"
+      - name: sourcetype
+        value: "'prisma:airs:session_action'"
+    pipeline: passthru
+    output: devnull
+  savedState: {}
+  notifications: []

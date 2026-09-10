@@ -1,0 +1,23 @@
+vct_prisma_airs_tsg_id:
+  type: string
+  value: "'1111111111'"
+  description: "Strata Cloud Manager tenant service group id (token scope
+    tsg_id:<id>). Placeholder: replace with your TSG id."
+  tags: vct,prisma-airs
+vct_prisma_airs_client_id:
+  type: string
+  value: "'REPLACE_WITH_SCM_CLIENT_ID'"
+  description: SCM service account client id
+  tags: vct,prisma-airs
+vct_prisma_airs_mgmt_host:
+  type: string
+  value: "'https://api.sase.paloaltonetworks.com/aisec'"
+  description: Prisma AIRS Management API base
+    (api.apps.paloaltonetworks.com/aisec also works)
+  tags: vct,prisma-airs
+vct_prisma_airs_secret_id:
+  type: string
+  value: "'vct-prisma-airs-rest-secret'"
+  description: Group-level text secret holding the SCM client secret (packs cannot
+    contain secrets)
+  tags: vct,prisma-airs

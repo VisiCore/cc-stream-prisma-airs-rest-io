@@ -1,0 +1,46 @@
+_vct_prisma_airs_eb:
+  description: Event breaking for Prisma AIRS Management API dashboard responses
+    (one event per scan action)
+  tags: vct,prisma-airs
+  minRawLength: 256
+  rules:
+    - name: session_actions
+      condition: source.includes('/sessions/session') ||
+        /"session_actions"\s*:/.test(_raw)
+      type: json_array
+      jsonArrayField: session_actions
+      timestampAnchorRegex: /"start_time"\s*:\s*"/
+      jsonTimeField: start_time
+      timestamp:
+        type: format
+        length: 150
+        format: "%Y-%m-%dT%H:%M:%SZ"
+      timestampTimezone: UTC
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 5000000
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: true
+      eventBreakerRegex: /[\n\r]+(?!\s)/
+    - name: sessions_overview
+      condition: source.includes('/sessions/sessionsoverview') ||
+        /"items"\s*:\s*\[/.test(_raw)
+      type: json_array
+      jsonArrayField: items
+      timestampAnchorRegex: /"last_session_activity"\s*:\s*"/
+      jsonTimeField: last_session_activity
+      timestamp:
+        type: format
+        length: 150
+        format: "%Y-%m-%dT%H:%M:%SZ"
+      timestampTimezone: UTC
+      timestampEarliest: -420weeks
+      timestampLatest: +1week
+      maxEventBytes: 5000000
+      disabled: false
+      parserEnabled: false
+      shouldUseDataRaw: false
+      jsonExtractAll: true
+      eventBreakerRegex: /[\n\r]+(?!\s)/
